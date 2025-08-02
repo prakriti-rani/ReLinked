@@ -15,7 +15,7 @@ export async function GET(
     const password = searchParams.get('password');
     
     // Find the URL
-    const urlDoc = await Url.findOne({ 
+    const urlDoc = await (Url as any).findOne({ 
       $and: [
         {
           $or: [

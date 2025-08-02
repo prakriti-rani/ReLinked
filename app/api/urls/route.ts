@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     // Check for URL deduplication (if user is logged in)
     if (session?.user) {
-      const existingUrl = await Url.findOne({
+      const existingUrl = await (Url as any).findOne({
         originalUrl,
         userId: session.user.id
       });
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     
     // Check if custom alias is available
     if (customAlias) {
-      const existingUrl = await Url.findOne({ 
+      const existingUrl = await (Url as any).findOne({ 
         $or: [
           { shortCode: customAlias },
           { customAlias: customAlias }
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
       // Ensure generated code is unique
       let attempts = 0;
       while (attempts < 5) {
-        const existingUrl = await Url.findOne({ shortCode });
+        const existingUrl = await (Url as any).findOne({ shortCode });
         if (!existingUrl) break;
         shortCode = nanoid(8);
         attempts++;
