@@ -43,6 +43,13 @@ const analyticsSchema = new mongoose.Schema({
 analyticsSchema.index({ urlId: 1, timestamp: -1 });
 analyticsSchema.index({ timestamp: -1 });
 
-const Analytics = mongoose.models.Analytics || mongoose.model('Analytics', analyticsSchema);
+// Safe model creation that works during build
+let Analytics: any;
+try {
+  Analytics = mongoose.models.Analytics || mongoose.model('Analytics', analyticsSchema);
+} catch (error) {
+  // During build time, mongoose might not be available
+  Analytics = null;
+}
 
 export default Analytics;

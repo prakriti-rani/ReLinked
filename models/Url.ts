@@ -68,6 +68,13 @@ urlSchema.index({ shortCode: 1 });
 urlSchema.index({ customAlias: 1 }, { sparse: true });
 urlSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-const Url = mongoose.models.Url || mongoose.model('Url', urlSchema);
+// Safe model creation that works during build
+let Url: any;
+try {
+  Url = mongoose.models.Url || mongoose.model('Url', urlSchema);
+} catch (error) {
+  // During build time, mongoose might not be available
+  Url = null;
+}
 
 export default Url;

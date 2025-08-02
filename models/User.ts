@@ -35,6 +35,13 @@ const userSchema = new mongoose.Schema({
 
 userSchema.index({ email: 1 });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+// Safe model creation that works during build
+let User: any;
+try {
+  User = mongoose.models.User || mongoose.model('User', userSchema);
+} catch (error) {
+  // During build time, mongoose might not be available
+  User = null;
+}
 
 export default User;
