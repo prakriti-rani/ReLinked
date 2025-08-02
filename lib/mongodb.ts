@@ -3,6 +3,10 @@ import mongoose from 'mongoose';
 // Only check for MONGODB_URI at runtime, not build time
 const MONGODB_URI = process.env.MONGODB_URI;
 
+// Build-time safety check
+const IS_BUILD_TIME = process.env.NEXT_PHASE === 'phase-production-build' || 
+                     process.env.NODE_ENV === 'development' && !MONGODB_URI;
+
 interface GlobalWithMongoose {
   mongoose: {
     conn: typeof mongoose | null;
@@ -19,6 +23,12 @@ if (!global.mongoose) {
 }
 
 async function connectDB() {
+  // Skip connection during build time
+  if (IS_BUILD_TIME) {
+    console.warn('MongoDB connection skipped during build');
+    return null;
+  }
+  
   // Check for MONGODB_URI at runtime
   if (!MONGODB_URI) {
     throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
