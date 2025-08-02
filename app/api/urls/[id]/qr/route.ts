@@ -21,7 +21,7 @@ export async function POST(
     await connectDB();
 
     // Find URL belonging to user
-    const urlDoc = await Url.findOne({ 
+    const urlDoc = await (Url as any).findOne({ 
       _id: params.id, 
       userId: session.user.id 
     });

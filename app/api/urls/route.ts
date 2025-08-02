@@ -269,13 +269,13 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const skip = (page - 1) * limit;
 
-    const urls = await Url.find({ userId: session.user.id })
+    const urls = await (Url as any).find({ userId: session.user.id })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .select('-__v');
 
-    const total = await Url.countDocuments({ userId: session.user.id });
+    const total = await (Url as any).countDocuments({ userId: session.user.id });
 
     return NextResponse.json({
       urls,

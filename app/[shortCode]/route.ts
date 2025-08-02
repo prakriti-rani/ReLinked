@@ -90,10 +90,13 @@ export async function GET(
       await analytics.save();
 
       // Update click count
-      await Url.findByIdAndUpdate(urlDoc._id, { 
-        $inc: { clicks: 1 },
-        updatedAt: new Date()
-      });
+      await (Url as any).findByIdAndUpdate(
+        urlDoc._id,
+        { 
+          $inc: { clicks: 1 },
+          updatedAt: new Date()
+        }
+      );
 
     } catch (analyticsError) {
       console.error('Analytics tracking error:', analyticsError);

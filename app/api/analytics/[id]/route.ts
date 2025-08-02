@@ -23,7 +23,7 @@ export async function GET(
     const urlId = params.id;
 
     // Verify URL belongs to user
-    const urlDoc = await Url.findOne({ _id: urlId, userId: session.user.id });
+    const urlDoc = await (Url as any).findOne({ _id: urlId, userId: session.user.id });
     if (!urlDoc) {
       return NextResponse.json(
         { error: 'URL not found' },
@@ -60,39 +60,39 @@ export async function GET(
     }
 
     // Get analytics data
-    const analytics = await Analytics.find(
+    const analytics = await (Analytics as any).find(
       { urlId, ...dateFilter },
       undefined,
       undefined
     ).sort({ timestamp: -1 });
 
     // Aggregate data for charts
-    const deviceStats = await Analytics.aggregate([
+    const deviceStats = await (Analytics as any).aggregate([
       { $match: { urlId: urlDoc._id, ...dateFilter } },
       { $group: { _id: '$device', count: { $sum: 1 } } },
       { $sort: { count: -1 } }
     ]);
 
-    const browserStats = await Analytics.aggregate([
+    const browserStats = await (Analytics as any).aggregate([
       { $match: { urlId: urlDoc._id, ...dateFilter } },
       { $group: { _id: '$browser', count: { $sum: 1 } } },
       { $sort: { count: -1 } }
     ]);
 
-    const osStats = await Analytics.aggregate([
+    const osStats = await (Analytics as any).aggregate([
       { $match: { urlId: urlDoc._id, ...dateFilter } },
       { $group: { _id: '$os', count: { $sum: 1 } } },
       { $sort: { count: -1 } }
     ]);
 
-    const countryStats = await Analytics.aggregate([
+    const countryStats = await (Analytics as any).aggregate([
       { $match: { urlId: urlDoc._id, ...dateFilter } },
       { $group: { _id: '$country', count: { $sum: 1 } } },
       { $sort: { count: -1 } }
     ]);
 
     // Daily clicks for chart
-    const dailyClicks = await Analytics.aggregate([
+    const dailyClicks = await (Analytics as any).aggregate([
       { $match: { urlId: urlDoc._id, ...dateFilter } },
       {
         $group: {
@@ -108,7 +108,7 @@ export async function GET(
     ]);
 
     // Hourly clicks for more detailed view
-    const hourlyClicks = await Analytics.aggregate([
+    const hourlyClicks = await (Analytics as any).aggregate([
       { $match: { urlId: urlDoc._id, ...dateFilter } },
       {
         $group: {
@@ -125,7 +125,7 @@ export async function GET(
     ]);
 
     // Weekly clicks aggregation
-    const weeklyClicks = await Analytics.aggregate([
+    const weeklyClicks = await (Analytics as any).aggregate([
       { $match: { urlId: urlDoc._id, ...dateFilter } },
       {
         $group: {
@@ -140,7 +140,7 @@ export async function GET(
     ]);
 
     // Peak hours analysis
-    const peakHours = await Analytics.aggregate([
+    const peakHours = await (Analytics as any).aggregate([
       { $match: { urlId: urlDoc._id, ...dateFilter } },
       {
         $group: {
@@ -152,7 +152,7 @@ export async function GET(
     ]);
 
     // Referrer stats
-    const referrerStats = await Analytics.aggregate([
+    const referrerStats = await (Analytics as any).aggregate([
       { $match: { urlId: urlDoc._id, ...dateFilter } },
       { 
         $group: { 

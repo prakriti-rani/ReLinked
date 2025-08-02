@@ -23,7 +23,7 @@ export async function DELETE(
     const urlId = params.id;
 
     // Verify URL belongs to user
-    const urlDoc = await Url.findOne({ _id: urlId, userId: session.user.id });
+    const urlDoc = await (Url as any).findOne({ _id: urlId, userId: session.user.id });
     if (!urlDoc) {
       return NextResponse.json(
         { error: 'URL not found' },
@@ -32,10 +32,10 @@ export async function DELETE(
     }
 
     // Delete analytics data first
-    await Analytics.deleteMany({ urlId });
+    await (Analytics as any).deleteMany({ urlId });
 
     // Delete the URL
-    await Url.findByIdAndDelete(urlId);
+    await (Url as any).findByIdAndDelete(urlId);
 
     return NextResponse.json({ message: 'URL deleted successfully' });
 
@@ -66,7 +66,7 @@ export async function GET(
     const urlId = params.id;
 
     // Verify URL belongs to user and get details
-    const urlDoc = await Url.findOne({ _id: urlId, userId: session.user.id });
+    const urlDoc = await (Url as any).findOne({ _id: urlId, userId: session.user.id });
     if (!urlDoc) {
       return NextResponse.json(
         { error: 'URL not found' },
