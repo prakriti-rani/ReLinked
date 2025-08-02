@@ -18,7 +18,13 @@ export async function POST(
       );
     }
 
-    await connectDB();
+    const dbConnection = await connectDB();
+    if (!dbConnection) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
 
     // Find URL belonging to user
     const urlDoc = await (Url as any).findOne({ 

@@ -18,7 +18,11 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          await connectDB();
+          const dbConnection = await connectDB();
+          if (!dbConnection) {
+            console.error('Database connection failed during authentication');
+            return null;
+          }
           
           const user = await (User as any).findOne({ email: credentials.email });
           

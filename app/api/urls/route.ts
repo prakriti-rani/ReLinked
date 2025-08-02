@@ -73,7 +73,13 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      await connectDB();
+      const dbConnection = await connectDB();
+      if (!dbConnection) {
+        return NextResponse.json(
+          { error: 'Service temporarily unavailable. Please try again.' },
+          { status: 503 }
+        );
+      }
     } catch (dbError) {
       console.error('Database connection error:', dbError);
       return NextResponse.json(
@@ -261,7 +267,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    await connectDB();
+    const dbConnection = await connectDB();
+    if (!dbConnection) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');

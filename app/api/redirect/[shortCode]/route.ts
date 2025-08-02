@@ -8,7 +8,10 @@ export async function GET(
   { params }: { params: { shortCode: string } }
 ) {
   try {
-    await connectDB();
+    const dbConnection = await connectDB();
+    if (!dbConnection) {
+      return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
+    }
     
     const { shortCode } = params;
     const { searchParams } = new URL(request.url);

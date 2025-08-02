@@ -18,7 +18,13 @@ export async function GET(
       );
     }
 
-    await connectDB();
+    const dbConnection = await connectDB();
+    if (!dbConnection) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
 
     const urlId = params.id;
 
