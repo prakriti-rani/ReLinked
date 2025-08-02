@@ -7,7 +7,6 @@ import { RateLimiterMemory } from 'rate-limiter-flexible';
 
 // Rate limiting
 const rateLimiter = new RateLimiterMemory({
-  keyGenerator: (req: NextRequest) => req.ip || 'anonymous',
   points: 5, // Number of requests
   duration: 60, // Per 60 seconds
 });
