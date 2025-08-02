@@ -1,11 +1,17 @@
 import mongoose from 'mongoose';
 
-// Only check for MONGODB_URI at runtime, not build time
-const MONGODB_URI = process.env.MONGODB_URI;
-
-// Build-time safety check
-const IS_BUILD_TIME = process.env.NEXT_PHASE === 'phase-production-build' || 
-                     process.env.NODE_ENV === 'development' && !MONGODB_URI;
+// More robust build-time detection
+const IS_BUILD_TIME = (() => {
+  try {
+    // During Vercel build, these conditions indicate build time
+    return process.env.NEXT_PHASE === 'phase-production-build' ||
+           process.env.VERCEL_ENV === undefined && process.env.NODE_ENV === 'production' ||
+           typeof window === 'undefined' && !process.env.MONGODB_URI && process.env.NODE_ENV === 'production';
+  } catch {
+    // If process is not available, assume runtime
+    return false;
+  }
+})();
 
 interface GlobalWithMongoose {
   mongoose: {
@@ -28,6 +34,9 @@ async function connectDB() {
     console.warn('MongoDB connection skipped during build');
     return null;
   }
+  
+  // Get MONGODB_URI at runtime only
+  const MONGODB_URI = process.env.MONGODB_URI;
   
   // Check for MONGODB_URI at runtime
   if (!MONGODB_URI) {

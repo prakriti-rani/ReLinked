@@ -1,12 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import Url from '@/models/Url';
-import Analytics from '@/models/Analytics';
+
+// Build-time safety check
+const IS_BUILD_TIME = (() => {
+  try {
+    return process.env.NEXT_PHASE === 'phase-production-build' ||
+           (process.env.NODE_ENV === 'production' && !process.env.MONGODB_URI);
+  } catch {
+    return false;
+  }
+})();
+
+// Conditional imports to avoid build-time issues
+let connectDB: any = null;
+let Url: any = null;
+let Analytics: any = null;
+
+if (!IS_BUILD_TIME) {
+  connectDB = require('@/lib/mongodb').default;
+  Url = require('@/models/Url').default;
+  Analytics = require('@/models/Analytics').default;
+}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { shortCode: string } }
 ) {
+  // Early return during build time
+  if (IS_BUILD_TIME) {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
+  }
+
   try {
     // Connect to database with error handling
     const dbConnection = await connectDB();
