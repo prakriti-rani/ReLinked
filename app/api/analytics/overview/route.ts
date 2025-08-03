@@ -8,14 +8,14 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.email) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     await connectDB();
 
     // Get all URLs for the user
-    const urls = await Url.find({ userId: session.user.email })
+    const urls = await Url.find({ userId: session.user.id })
       .sort({ createdAt: -1 })
       .lean();
 
