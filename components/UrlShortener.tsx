@@ -290,27 +290,39 @@ export default function UrlShortener() {
                   <Sparkles className="h-4 w-4 text-purple-600" />
                   <span className="font-medium text-purple-800">AI Insights:</span>
                 </div>
-                <div className="text-gray-700 space-y-2">
-                  {result.aiSuggestions.split(/\d+\.\s+/).filter(item => item.trim()).map((insight, index) => {
-                    // Parse the insight to handle bold formatting
-                    const formatInsight = (text: string) => {
-                      return text.split(/\*\*([^*]+)\*\*/g).map((part, i) => {
+                <div className="text-gray-700 space-y-3">
+                  {(() => {
+                    // Function to format text and remove ** markdown
+                    const formatText = (text: string) => {
+                      // Split text by ** patterns and convert to JSX
+                      const parts = text.split(/\*\*([^*]+)\*\*/g);
+                      return parts.map((part, i) => {
                         if (i % 2 === 1) {
-                          return <strong key={i} className="font-semibold text-gray-800">{part}</strong>
+                          // This is the text that was between **
+                          return <span key={i} className="font-semibold text-gray-900">{part}</span>
                         }
-                        return part
+                        return <span key={i}>{part}</span>
                       })
                     }
-                    
-                    return (
+
+                    // Split the AI suggestions into numbered items
+                    const items = result.aiSuggestions
+                      .split(/(?=\d+\.\s+)/) // Split before each numbered item
+                      .filter(item => item.trim()) // Remove empty items
+                      .map(item => item.replace(/^\d+\.\s*/, '').trim()) // Remove the number prefix
+                      .filter(item => item.length > 0); // Remove empty items
+
+                    return items.map((item, index) => (
                       <div key={index} className="flex items-start space-x-2">
-                        <span className="text-purple-600 font-medium text-xs mt-0.5">{index + 1}.</span>
-                        <div className="flex-1">
-                          {formatInsight(insight.trim())}
+                        <span className="text-purple-600 font-bold text-sm mt-0.5 flex-shrink-0">
+                          {index + 1}.
+                        </span>
+                        <div className="flex-1 text-sm leading-relaxed">
+                          {formatText(item)}
                         </div>
                       </div>
-                    )
-                  })}
+                    ))
+                  })()}
                 </div>
               </div>
             )}
