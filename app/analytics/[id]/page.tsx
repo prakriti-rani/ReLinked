@@ -384,7 +384,7 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
                   </p>
                   {lastUpdated && (
                     <p className="text-xs text-gray-500">
-                      Last updated: {formatTimeIST(lastUpdated, DateFormats.FULL)}
+                      Last updated: {formatTimeIST(lastUpdated, DateFormats.datetime)}
                     </p>
                   )}
                 </div>
