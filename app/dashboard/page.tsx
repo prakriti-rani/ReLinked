@@ -202,7 +202,7 @@ export default function Dashboard() {
               <Plus className="h-5 w-5" />
               <span>Create New URL</span>
             </button>
-            <button className="btn-secondary flex items-center space-x-2">
+            <button className="btn-secondary flex items-center space-x-2" onClick={() => router.push('/analytics')}>
               <BarChart3 className="h-5 w-5" />
               <span>View Analytics</span>
             </button>

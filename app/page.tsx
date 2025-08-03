@@ -136,7 +136,7 @@ export default function Home() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Trusted by Thousands
+              Building a better way to shorten and track your links
             </h2>
             <p className="text-lg text-gray-600">
               Join the growing community of users who trust ReLinked for their URL shortening needs.
@@ -144,10 +144,10 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <StatCard number="2K+" label="Links Created" />
-            <StatCard number="15K+" label="Clicks Tracked" />
-            <StatCard number="99.9%" label="Uptime" />
-            <StatCard number="24/7" label="Support" />
+            <StatCard number="1K+" label="Links Created" />
+            <StatCard number="7K+" label="Clicks Tracked" />
+            <StatCard number="Instant" label="Analytics" />
+            <StatCard number="Stable" label="Performance" />
           </div>
         </div>
       </section>
