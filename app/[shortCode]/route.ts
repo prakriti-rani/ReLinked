@@ -59,9 +59,26 @@ export async function GET(
       return NextResponse.redirect(new URL('/404', request.url));
     }
 
-    // Check if URL is expired
-    if (urlDoc.expiresAt && new Date() > urlDoc.expiresAt) {
-      return NextResponse.redirect(new URL('/expired', request.url));
+    // Check if URL is expired (compare in IST timezone)
+    if (urlDoc.expiresAt) {
+      const now = new Date();
+      const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+      const nowIST = new Date(now.getTime() + istOffset);
+      const expiresAtIST = new Date(urlDoc.expiresAt.getTime());
+      
+      // Debug logging for expiration check
+      console.log('Expiration Check:', {
+        nowUTC: now.toISOString(),
+        nowIST: nowIST.toISOString(),
+        expiresAtStored: urlDoc.expiresAt.toISOString(),
+        expiresAtIST: expiresAtIST.toISOString(),
+        isExpired: nowIST > expiresAtIST,
+        shortCode: shortCode
+      });
+      
+      if (nowIST > expiresAtIST) {
+        return NextResponse.redirect(new URL('/expired', request.url));
+      }
     }
 
     // Check password protection

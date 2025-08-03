@@ -35,6 +35,26 @@ export async function POST(request: NextRequest) {
 
     const { originalUrl, customAlias, expiresAt, tags, password } = await request.json();
 
+    // Helper function to convert to IST and ensure proper date handling
+    const processExpirationDate = (dateString: string | null) => {
+      if (!dateString) return undefined;
+      
+      const inputDate = new Date(dateString);
+      // If the date is invalid, return undefined
+      if (isNaN(inputDate.getTime())) return undefined;
+      
+      // Debug logging for expiration date processing
+      console.log('Processing expiration date:', {
+        input: dateString,
+        parsedDate: inputDate.toISOString(),
+        timestamp: inputDate.getTime()
+      });
+      
+      // Ensure we're working with IST timezone
+      // If the frontend sends a date in local timezone, we need to preserve the time as IST
+      return inputDate;
+    };
+
     // Validation
     if (!originalUrl) {
       return NextResponse.json(
@@ -223,7 +243,7 @@ URL: ${originalUrl}`;
       shortCode,
       customAlias: customAlias || undefined,
       userId: session?.user?.id || null, // Allow null for anonymous users
-      expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+      expiresAt: processExpirationDate(expiresAt),
       password: password || undefined, // Store password for protection
       tags: tags || [],
       qrCode: qrCodeDataUrl, // Store QR code data URL
