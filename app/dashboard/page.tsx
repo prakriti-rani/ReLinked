@@ -49,6 +49,14 @@ export default function Dashboard() {
       router.push('/auth/signin')
     } else if (status === 'authenticated') {
       fetchUrls()
+      
+      // Set up auto-refresh every 60 seconds for dashboard
+      const interval = setInterval(() => {
+        fetchUrls()
+      }, 60000) // Update every 60 seconds (less frequent than analytics)
+      
+      // Cleanup interval on component unmount
+      return () => clearInterval(interval)
     }
   }, [status, router])
 

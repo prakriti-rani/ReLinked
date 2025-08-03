@@ -286,11 +286,32 @@ export default function UrlShortener() {
 
             {result.aiSuggestions && (
               <div className="text-sm text-gray-600 bg-purple-50 p-3 rounded border border-purple-200">
-                <div className="flex items-center space-x-1 mb-1">
+                <div className="flex items-center space-x-1 mb-2">
                   <Sparkles className="h-4 w-4 text-purple-600" />
                   <span className="font-medium text-purple-800">AI Insights:</span>
                 </div>
-                <p>{result.aiSuggestions}</p>
+                <div className="text-gray-700 space-y-2">
+                  {result.aiSuggestions.split(/\d+\.\s+/).filter(item => item.trim()).map((insight, index) => {
+                    // Parse the insight to handle bold formatting
+                    const formatInsight = (text: string) => {
+                      return text.split(/\*\*([^*]+)\*\*/g).map((part, i) => {
+                        if (i % 2 === 1) {
+                          return <strong key={i} className="font-semibold text-gray-800">{part}</strong>
+                        }
+                        return part
+                      })
+                    }
+                    
+                    return (
+                      <div key={index} className="flex items-start space-x-2">
+                        <span className="text-purple-600 font-medium text-xs mt-0.5">{index + 1}.</span>
+                        <div className="flex-1">
+                          {formatInsight(insight.trim())}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             )}
 

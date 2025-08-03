@@ -15,7 +15,8 @@ import {
   ExternalLink,
   Eye,
   TrendingUp,
-  Share2
+  Share2,
+  RefreshCw
 } from 'lucide-react'
 import {
   Chart as ChartJS,
@@ -79,6 +80,8 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [period, setPeriod] = useState('7d')
   const [chartType, setChartType] = useState<'daily' | 'hourly' | 'peakHours'>('daily')
 
@@ -87,15 +90,28 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
       router.push('/auth/signin')
     } else if (status === 'authenticated') {
       fetchAnalytics()
+      
+      // Set up real-time updates every 30 seconds
+      const interval = setInterval(() => {
+        fetchAnalytics()
+      }, 30000) // Update every 30 seconds
+      
+      // Cleanup interval on component unmount
+      return () => clearInterval(interval)
     }
   }, [status, router, period])
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = async (showRefreshIndicator = false) => {
+    if (showRefreshIndicator) {
+      setIsRefreshing(true)
+    }
+    
     try {
       const response = await fetch(`/api/analytics/${params.id}?period=${period}`)
       if (response.ok) {
         const analyticsData = await response.json()
         setData(analyticsData)
+        setLastUpdated(new Date())
       } else {
         router.push('/dashboard')
       }
@@ -103,7 +119,12 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
       console.error('Failed to fetch analytics:', error)
     } finally {
       setIsLoading(false)
+      setIsRefreshing(false)
     }
+  }
+
+  const handleManualRefresh = () => {
+    fetchAnalytics(true)
   }
 
   if (status === 'loading' || isLoading) {
@@ -327,7 +348,21 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
             
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
               <div className="mb-4 lg:mb-0">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Analytics</h1>
+                <div className="flex items-center space-x-4 mb-2">
+                  <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
+                  <button
+                    onClick={handleManualRefresh}
+                    disabled={isRefreshing}
+                    className={`flex items-center space-x-2 px-3 py-1 text-sm font-medium rounded-md border transition-colors ${
+                      isRefreshing 
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                        : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                    }`}
+                  >
+                    <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+                  </button>
+                </div>
                 <div className="space-y-1">
                   <p className="text-sm text-gray-600">
                     Short URL: <span className="font-medium">relinked.app/{data.url.shortCode}</span>
@@ -347,6 +382,11 @@ export default function AnalyticsPage({ params }: { params: { id: string } }) {
                       <ExternalLink className="inline h-3 w-3 ml-1" />
                     </a>
                   </p>
+                  {lastUpdated && (
+                    <p className="text-xs text-gray-500">
+                      Last updated: {formatTimeIST(lastUpdated, DateFormats.FULL)}
+                    </p>
+                  )}
                 </div>
               </div>
 
